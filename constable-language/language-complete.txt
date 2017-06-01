@@ -1,0 +1,9 @@
+space ID [=] [-|+] [recursive] (STRING | path | space ID) [ ] [-|+] [recursive] (STRING | path | space ID) [ ]... ;
+
+primary (tree STRING | space ID [= [-|+] [recursive] ( STRING | path | space ID) [ ] [-|+] [recursive] ( STRING | path | space ID) [ ]... ]) ; 
+
+(* | [recursive] (STRING | path) | ID) (ID [: ehhlist] | [access]) (* | [recursive] (STRING | path) | ID) (ID [: ehhlist] | [access])...  ID : ehhlist { CMDS }
+
+tree STRING ID ID... of ID [by ID S_exp] ;
+
+function ID [ { CMDS } ];

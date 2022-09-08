@@ -3,6 +3,7 @@ from collections import defaultdict
 import pickle
 import pprint
 from copy import deepcopy
+from typing import List
 
 
 class Flag:
@@ -105,6 +106,7 @@ def beautify(string):
     d["T|'}'"] = '}'
     d["T|':'"] = ':'
     d["T|'*'"] = '*'
+    d["T|','"] = ','
 
     return d.get(string, string)
 
@@ -209,14 +211,42 @@ lang = defaultdict(lambda: defaultdict(list))
 visited_code = 100
 
 
+def special_comma_split(s: str) -> List[str]:
+    """Split s at commas, but don't split ',' (comma in apostrophes). s must not
+    start or end with a comma!"""
+    ret = []
+    last_comma_index = 0        # Tu si udrzujeme index prveho znaku po
+                                # poslednej ciarke (nie index poslednej ciarky!)
+    i = 0
+    while i < len(s):
+        c = s[i]
+        if c != ',':
+            i += 1
+            continue
+        # V nasom pripade nemusime kontrolovat znaky z oboch stran, ale pre
+        # istotu a vyhnutiu sa neocakavanym bugom skontrolujeme obe strany.
+        if s[i-1] == "'" and s[i+1] == "'":
+            ret.append(s[last_comma_index:i+2])
+            last_comma_index = i+3
+            i = i + 4
+            continue
+        # We have a comma s[i] == ","
+        ret.append(s[last_comma_index:i])
+        last_comma_index = i + 1
+        i = i + 2
+    ret.append(s[last_comma_index:i])
+    return ret
+
+
 def main():
     with open('language.txt') as f:
         for l in f:
             m = prog.match(l)
             state = m.group(1)
-            column = m.group(2).split(',')[0]  # Okrem END na konci, alebo END ak je
-                                               # to jediny terminal
-            contents = m.group(3).split(',')[:-1] # Okrem END na konci
+            column = special_comma_split(m.group(2))[0]  # Okrem END na konci,
+                                               # alebo END ak je to jediny
+                                               # terminal
+            contents = special_comma_split(m.group(3))[:-1] # Okrem END na konci
             lang[state][column] = contents
 
         # pprint.pprint(lang)
